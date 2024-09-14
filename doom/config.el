@@ -88,3 +88,7 @@
       :desc "Kill Emacs" "qq" 'kill-emacs
       :desc "Quit This Connection" "qf" 'kill-terminal
       :desc "Execute Command" "SPC" 'execute-extended-command)
+
+;; Wakatime mode
+(global-wakatime-mode)
+;; The API key should be set in custom.el

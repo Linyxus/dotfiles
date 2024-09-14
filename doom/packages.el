@@ -55,5 +55,9 @@
   :recipe (:host github :repo "protesilaos/modus-themes"))
 
 ;; EF themes
-(package! modus-themes
+(package! ef-themes
   :recipe (:host github :repo "protesilaos/ef-themes"))
+
+;; Wakatime
+(package! wakatime-mode
+  :recipe (:host github :repo "wakatime/wakatime-mode"))
