@@ -53,3 +53,7 @@
 ;; modus themes
 (package! modus-themes
   :recipe (:host github :repo "protesilaos/modus-themes"))
+
+;; EF themes
+(package! modus-themes
+  :recipe (:host github :repo "protesilaos/ef-themes"))
