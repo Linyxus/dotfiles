@@ -80,4 +80,11 @@
 ;; they are implemented.
 ;;
 
+;; General key map preferences
 (setq doom-localleader-key ",")
+(map! :map 'override
+      :leader
+      :desc "Switch to Buffer" "bb" 'switch-to-buffer
+      :desc "Kill Emacs" "qq" 'kill-emacs
+      :desc "Quit This Connection" "qf" 'kill-terminal
+      :desc "Execute Command" "SPC" 'execute-extended-command)
