@@ -94,4 +94,24 @@
 
 ;; Wakatime mode
 (global-wakatime-mode)
-;; The API key should be set in custom.el
+;; The API key and the executable path should be set in custom.el
+
+
+;; winnum
+(use-package! winum
+  :config
+  ;; winum modifies `mode-line-format' in a destructive manner. I'd rather leave
+  ;; it to modeline plugins (or the user) to add this if they want it.
+  (setq winum-auto-setup-mode-line nil)
+  (winum-mode +1)
+  (map! :leader
+        "0" #'winum-select-window-0-or-10
+        "1" #'winum-select-window-1
+        "2" #'winum-select-window-2
+        "3" #'winum-select-window-3
+        "4" #'winum-select-window-4
+        "5" #'winum-select-window-5
+        "6" #'winum-select-window-6
+        "7" #'winum-select-window-7
+        "8" #'winum-select-window-8
+        "9" #'winum-select-window-9))
