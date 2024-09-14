@@ -36,7 +36,7 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'ef-summer)
+(setq doom-theme 'ef-maris-light)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -84,10 +84,13 @@
 (setq doom-localleader-key ",")
 (map! :map 'override
       :leader
-      :desc "Switch to Buffer" "bb" 'switch-to-buffer
+      :desc "Switch to buffer" "bb" 'switch-to-buffer
       :desc "Kill Emacs" "qq" 'kill-emacs
-      :desc "Quit This Connection" "qf" 'kill-terminal
-      :desc "Execute Command" "SPC" 'execute-extended-command)
+      :desc "Quit this connection" "qf" 'kill-terminal
+      :desc "Execute command" "SPC" 'execute-extended-command
+      :desc "Kill other windows" "w1" 'delete-other-windows
+      :desc "Split the current window on the right" "w2" 'split-window-right
+      :desc "Split the current window on the below" "w-" 'split-window-below)
 
 ;; Wakatime mode
 (global-wakatime-mode)
