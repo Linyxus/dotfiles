@@ -90,7 +90,8 @@
       :desc "Execute command" "SPC" 'execute-extended-command
       :desc "Kill other windows" "w1" 'delete-other-windows
       :desc "Split the current window on the right" "w2" 'split-window-right
-      :desc "Split the current window on the below" "w-" 'split-window-below)
+      :desc "Split the current window on the below" "w-" 'split-window-below
+      :desc "Switch to last buffer" "TAB" 'evil-switch-to-windows-last-buffer)
 
 ;; Wakatime mode
 (global-wakatime-mode)
