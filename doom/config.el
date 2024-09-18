@@ -87,7 +87,7 @@
       :leader
       :desc "Switch to buffer" "bb" 'switch-to-buffer
       :desc "Kill Emacs" "qq" 'kill-emacs
-      :desc "Quit this connection" "qf" 'kill-terminal
+      :desc "Quit this connection" "qf" 'save-buffers-kill-terminal
       :desc "Execute command" "SPC" 'execute-extended-command
       :desc "Kill other windows" "w1" 'delete-other-windows
       :desc "Split the current window on the right" "w2" 'split-window-right
