@@ -25,8 +25,8 @@
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
 (setq doom-font
       (font-spec
-       :family "Fira Code"
-       :size 13))
+       :family "CommitMono"
+       :size 12))
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
@@ -82,6 +82,7 @@
 
 ;; General key map preferences
 (setq doom-localleader-key ",")
+
 (map! :map 'override
       :leader
       :desc "Switch to buffer" "bb" 'switch-to-buffer
@@ -91,7 +92,9 @@
       :desc "Kill other windows" "w1" 'delete-other-windows
       :desc "Split the current window on the right" "w2" 'split-window-right
       :desc "Split the current window on the below" "w-" 'split-window-below
-      :desc "Switch to last buffer" "TAB" 'evil-switch-to-windows-last-buffer)
+      :desc "Switch to last buffer" "TAB" 'evil-switch-to-windows-last-buffer
+      :desc "Switch to scratch buffer" "bs" 'doom/switch-to-scratch-buffer
+      :desc "Adjust text scale" "zx" 'text-scale-adjust)
 
 ;; Wakatime mode
 (global-wakatime-mode)
