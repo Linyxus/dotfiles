@@ -26,7 +26,7 @@
 (setq doom-font
       (font-spec
        :family "CommitMono"
-       :size 12))
+       :size 14))
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
@@ -109,7 +109,7 @@
   (setq winum-auto-setup-mode-line nil)
   (winum-mode +1)
   (map! :leader
-        "0" #'winum-select-window-0-or-10
+        ;; "0" #'winum-select-window-0-or-10
         "1" #'winum-select-window-1
         "2" #'winum-select-window-2
         "3" #'winum-select-window-3
@@ -119,3 +119,15 @@
         "7" #'winum-select-window-7
         "8" #'winum-select-window-8
         "9" #'winum-select-window-9))
+
+;; org-mode kbds
+(map! :after org
+      :map org-mode-map
+      :localleader
+      "k" #'org-todo)
+
+;; neotree kbds
+(map! :after neotree
+      :leader
+      "0" #'+neotree/open
+      "ft" #'+neotree/open)
