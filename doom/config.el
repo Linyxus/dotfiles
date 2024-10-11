@@ -179,3 +179,33 @@
   :init (add-hook 'ledger-mode-hook 'evil-ledger-mode))
 
 (use-package! agda-input)
+
+;; gptel
+(use-package! gptel
+  :defer t)
+;; Set the api key in custom.el
+
+(map!
+ :map 'override
+ :leader
+ :desc "Open gptel" "og" #'gptel)
+
+(map!
+ :map 'gptel-mode-map
+ :n "?" #'gptel-menu
+ :n "q" #'evil-quit)
+
+(map!
+ :map 'gptel-mode-map
+ :localleader
+ "SPC" #'gptel-send
+ "a" #'gptel-add)
+
+;; dotty
+(use-package! dotty
+  :after-call scala-mode-hook
+  :config
+  (map!
+   :map 'override
+   :leader
+   :desc "Open SBT console" "os" #'sbt/console))

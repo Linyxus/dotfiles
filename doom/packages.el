@@ -65,9 +65,17 @@
 ;; winnum
 (package! winum :pin "c5455e866e8a5f7eab6a7263e2057aff5f1118b9")
 
+;; hledger
 (package! ledger-mode)
-
 (package! evil-ledger)
 
+;; agda-input
 (package! agda-input
   :recipe (:local-repo "agda-input"))
+
+;; dotty
+(package! dotty
+  :recipe (:local-repo "dotty"))
+
+;; gptel
+(package! gptel)
