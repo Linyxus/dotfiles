@@ -79,3 +79,6 @@
 
 ;; gptel
 (package! gptel)
+
+;; zetteldeft
+(package! zetteldeft)

@@ -49,6 +49,8 @@
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 
+(setq deft-directory "~/.deft/")
+
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
@@ -131,6 +133,11 @@
       :desc "Todo keywords" "k" #'org-todo
       :desc "Org action" "," #'org-ctrl-c-ctrl-c
       :desc "Org babel tangle" "bt" #'org-babel-tangle)
+
+(map! :after org
+      :map 'override
+      :leader
+      :desc "Org Agenda" "bh" #'org-agenda)
 
 (map! :after org
       :map org-agenda-mode-map
@@ -223,3 +230,13 @@
  :localleader
  :desc "Goto definition" "gg" #'lsp-ui-peek-find-definitions
  :desc "Goto references" "gr" #'lsp-ui-peek-find-references)
+
+(use-package! zetteldeft
+  :after deft
+  :config
+  (zetteldeft-set-classic-keybindings)
+  (map!
+   :after org
+   :map org-mode-map
+   :localleader
+   :desc "Follow link" "zf" #'zetteldeft-follow-link))
