@@ -88,16 +88,18 @@
 
 (map! :map 'override
       :leader
-      :desc "Switch to buffer" "bb" 'switch-to-buffer
-      :desc "Kill Emacs" "qq" 'kill-emacs
-      :desc "Quit this connection" "qf" 'save-buffers-kill-terminal
-      :desc "Execute command" "SPC" 'execute-extended-command
-      :desc "Kill other windows" "w1" 'delete-other-windows
-      :desc "Split the current window on the right" "w2" 'split-window-right
-      :desc "Split the current window on the below" "w-" 'split-window-below
-      :desc "Switch to last buffer" "TAB" 'evil-switch-to-windows-last-buffer
-      :desc "Switch to scratch buffer" "bs" 'doom/switch-to-scratch-buffer
-      :desc "Adjust text scale" "zx" 'text-scale-adjust)
+      :desc "Switch to buffer" "bb" #'switch-to-buffer
+      :desc "Kill Emacs" "qq" #'kill-emacs
+      :desc "Quit this connection" "qf" #'save-buffers-kill-terminal
+      :desc "Execute command" "SPC" #'execute-extended-command
+      :desc "Kill other windows" "w1" #'delete-other-windows
+      :desc "Split the current window on the right" "w2" #'split-window-right
+      :desc "Split the current window on the below" "w-" #'split-window-below
+      :desc "Switch to last buffer" "TAB" #'evil-switch-to-windows-last-buffer
+      :desc "Switch to scratch buffer" "bs" #'doom/switch-to-scratch-buffer
+      :desc "Adjust text scale" "zx" #'text-scale-adjust
+      :desc "Magit status" "gs" #'magit-status
+      :desc "Magit blame" "gb" #'magit-blame-addition)
 
 ;; Wakatime mode
 (global-wakatime-mode)
