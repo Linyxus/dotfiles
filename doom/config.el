@@ -128,7 +128,9 @@
 (map! :after org
       :map org-mode-map
       :localleader
-      "k" #'org-todo)
+      :desc "Todo keywords" k #'org-todo
+      :desc "Org action" "," #'org-ctrl-c-ctrl-c
+      :desc "Org babel tangle" "bt" #'org-babel-tangle)
 
 ;; neotree kbds
 (map! :map 'override
