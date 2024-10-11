@@ -132,6 +132,11 @@
       :desc "Org action" "," #'org-ctrl-c-ctrl-c
       :desc "Org babel tangle" "bt" #'org-babel-tangle)
 
+(map! :after org
+      :map org-agenda-mode-map
+      :localleader
+      :desc "Toggle log mode" "l" #'org-agenda-log-mode)
+
 ;; neotree kbds
 (map! :map 'override
       :leader
