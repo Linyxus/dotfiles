@@ -127,7 +127,7 @@
       "k" #'org-todo)
 
 ;; neotree kbds
-(map! :after neotree
+(map! :map 'override
       :leader
-      "0" #'+neotree/open
+      "0" #'+neotree/find-this-file
       "ft" #'+neotree/open)
