@@ -136,6 +136,10 @@
       "0" #'+neotree/find-this-file
       "ft" #'+neotree/open)
 
+;; vterm kbds
+(map! :map 'override
+      :leader
+      "'" #'+vterm/toggle)
 
 ;; ledger mode
 (use-package! ledger-mode
