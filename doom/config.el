@@ -128,7 +128,7 @@
 (map! :after org
       :map org-mode-map
       :localleader
-      :desc "Todo keywords" k #'org-todo
+      :desc "Todo keywords" "k" #'org-todo
       :desc "Org action" "," #'org-ctrl-c-ctrl-c
       :desc "Org babel tangle" "bt" #'org-babel-tangle)
 
@@ -209,3 +209,10 @@
    :map 'override
    :leader
    :desc "Open SBT console" "os" #'sbt/console))
+
+(map!
+ :after scala-mode
+ :map scala-mode-map
+ :localleader
+ :desc "Goto definition" "gg" #'lsp-ui-peek-find-definitions
+ :desc "Goto references" "gr" #'lsp-ui-peek-find-references)
