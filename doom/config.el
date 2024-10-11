@@ -239,4 +239,4 @@
    :after org
    :map org-mode-map
    :localleader
-   :desc "Follow link" "zf" #'zetteldeft-follow-link))
+   :desc "Zetteldeft" "z" #'zetteldeft-prefix))
