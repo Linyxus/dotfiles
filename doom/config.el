@@ -25,8 +25,11 @@
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
 (setq doom-font
       (font-spec
-       :family "CommitMono"
-       :size 14))
+       :family "JuliaMono"
+       :size 13
+       :weight 'semi-light))
+(setq-default line-spacing 6)
+
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
