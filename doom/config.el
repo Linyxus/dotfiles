@@ -182,7 +182,9 @@
 
 ;; gptel
 (use-package! gptel
-  :defer t)
+  :defer t
+  :config
+  (setq-default gptel-model "gpt-4o"))
 ;; Set the api key in custom.el
 
 (map!
