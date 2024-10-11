@@ -175,3 +175,5 @@
 (use-package! evil-ledger
   :defer t
   :init (add-hook 'ledger-mode-hook 'evil-ledger-mode))
+
+(use-package! agda-input)

@@ -68,3 +68,6 @@
 (package! ledger-mode)
 
 (package! evil-ledger)
+
+(package! agda-input
+  :recipe (:local-repo "agda-input"))
