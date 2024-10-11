@@ -26,8 +26,8 @@
 (setq doom-font
       (font-spec
        :family "JuliaMono"
-       :size 13
-       :weight 'semi-light))
+       :size 11
+       :weight 'light))
 (setq-default line-spacing 6)
 
 ;;
