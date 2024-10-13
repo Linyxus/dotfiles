@@ -25,8 +25,8 @@
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
 (setq doom-font
       (font-spec
-       :family "JuliaMono"
-       :size 13
+       :family "CommitMono"
+       :size 11.5
        :weight 'light))
 (setq-default line-spacing 6)
 
