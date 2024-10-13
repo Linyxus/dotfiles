@@ -195,6 +195,9 @@
  :desc "Goto definition" "gg" #'lsp-ui-peek-find-definitions
  :desc "Goto references" "gr" #'lsp-ui-peek-find-references)
 
+(after! lsp-mode
+  (setq-default lsp-enable-file-watchers nil))
+
 ;; zetteldeft
 (use-package! zetteldeft
   :after deft
