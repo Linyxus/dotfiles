@@ -71,11 +71,11 @@
 
 ;; agda-input
 (package! agda-input
-  :recipe (:local-repo "agda-input"))
+  :recipe (:local-repo "site-lisp"))
 
 ;; dotty
 (package! dotty
-  :recipe (:local-repo "dotty"))
+  :recipe (:local-repo "site-lisp"))
 
 ;; gptel
 (package! gptel)
