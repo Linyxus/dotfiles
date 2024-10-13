@@ -49,7 +49,6 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
 
-
 ;; modus themes
 (package! modus-themes
   :recipe (:host github :repo "protesilaos/modus-themes"))
@@ -62,12 +61,8 @@
 (package! wakatime-mode
   :recipe (:host github :repo "wakatime/wakatime-mode"))
 
-;; winnum
+;; winum
 (package! winum :pin "c5455e866e8a5f7eab6a7263e2057aff5f1118b9")
-
-;; hledger
-(package! ledger-mode)
-(package! evil-ledger)
 
 ;; agda-input
 (package! agda-input

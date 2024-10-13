@@ -112,6 +112,7 @@
 
        :lang
        lean4
+       hledger
        ;;agda              ; types of types of types of types...
        ;;beancount         ; mind the GAAP
        ;;(cc +lsp)         ; C > C++ == 1
