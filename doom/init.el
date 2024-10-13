@@ -111,6 +111,7 @@
        ;;tty               ; improve the terminal Emacs experience
 
        :lang
+       lean4
        ;;agda              ; types of types of types of types...
        ;;beancount         ; mind the GAAP
        ;;(cc +lsp)         ; C > C++ == 1
