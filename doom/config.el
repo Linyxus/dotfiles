@@ -144,6 +144,10 @@
       :localleader
       :desc "Toggle log mode" "l" #'org-agenda-log-mode)
 
+(after! org
+  (setq org-agenda-start-with-log-mode '(closed clock state)
+        org-log-done t))
+
 ;; neotree kbds
 (map! :map 'override
       :leader
