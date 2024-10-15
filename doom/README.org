@@ -1,0 +1,9 @@
+#+title: My Doom Emacs Configuration
+
+* Setting up custom variables
+
+After a fresh install in a new environment, a bunch of custom variables needs to
+be setup for the configuration to function properly. They are mostly API keys.
+
+- =wakatime-api-key=
+- =gptel-api-key=
