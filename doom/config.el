@@ -101,7 +101,8 @@
       :desc "Switch to scratch buffer" "bs" #'doom/switch-to-scratch-buffer
       :desc "Adjust text scale" "zx" #'text-scale-adjust
       :desc "Magit status" "gs" #'magit-status
-      :desc "Magit blame" "gb" #'magit-blame-addition)
+      :desc "Magit blame" "gb" #'magit-blame-addition
+      :desc "Toggle Auto-Fill" "tx" #'toggle-text-mode-auto-fill)
 
 ;; Wakatime mode
 (global-wakatime-mode)
