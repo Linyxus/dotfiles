@@ -212,5 +212,8 @@
    :after org
    :map org-mode-map
    :localleader
-   :desc "Zetteldeft" "z" #'zetteldeft-prefix))
-
+   :desc "Zetteldeft" "z" #'zetteldeft-prefix)
+  (map!
+   :map 'override
+   :leader
+   :desc "New Zetteldeft Note" "nzn" #'zetteldeft-new-file))
