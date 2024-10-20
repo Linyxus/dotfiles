@@ -26,7 +26,7 @@
 (setq doom-font
       (font-spec
        :family "CommitMono"
-       :size 11.5
+       :size 13
        :weight 'light))
 (setq-default line-spacing 6)
 
