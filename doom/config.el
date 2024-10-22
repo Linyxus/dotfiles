@@ -104,6 +104,9 @@
       :desc "Magit blame" "gb" #'magit-blame-addition
       :desc "Toggle Auto-Fill" "tx" #'toggle-text-mode-auto-fill)
 
+(map! :map 'override
+      :desc "Avy goto line" :n "gsl" #'evil-avy-goto-line)
+
 ;; Wakatime mode
 (global-wakatime-mode)
 ;; The API key and the executable path should be set in custom.el
