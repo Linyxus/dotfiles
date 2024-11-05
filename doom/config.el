@@ -26,12 +26,12 @@
 (setq doom-font
       (font-spec
        :family "CommitMono"
-       :size 13
+       :size 15
        :weight 'light)
       doom-symbol-font
       (font-spec
        :family "Fira Code"
-       :size 13
+       :size 15
        :weight 'light))
 (setq-default line-spacing 6)
 
@@ -225,3 +225,5 @@
    :map 'override
    :leader
    :desc "New Zetteldeft Note" "nzn" #'zetteldeft-new-file))
+
+(setq +latex-viewers '(pdf-tools))
