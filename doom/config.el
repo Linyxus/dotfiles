@@ -30,7 +30,7 @@
        :weight 'light)
       doom-symbol-font
       (font-spec
-       :family "Fira Code"
+       :family "CommitMono Nerd Font"
        :size 13
        :weight 'light))
 (setq-default line-spacing 6)
