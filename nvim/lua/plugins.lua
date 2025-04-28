@@ -83,18 +83,18 @@ return require('packer').startup(function(use)
   }
 
   -- Neorg
-  use {
-      "nvim-neorg/neorg",
-      run = ":Neorg sync-parsers",
-      config = function()
-        require('neorg').setup {
-          load = {
-            ["core.defaults"] = {}
-          }
-        }
-      end,
-      requires = "nvim-lua/plenary.nvim"
-  }
+  -- use {
+  --     "nvim-neorg/neorg",
+  --     run = ":Neorg sync-parsers",
+  --     config = function()
+  --       require('neorg').setup {
+  --         load = {
+  --           ["core.defaults"] = {}
+  --         }
+  --       }
+  --     end,
+  --     requires = "nvim-lua/plenary.nvim"
+  -- }
 
   -- catppuccin
   use {
