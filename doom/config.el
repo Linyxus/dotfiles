@@ -26,12 +26,12 @@
 (setq doom-font
       (font-spec
        :family "CommitMono"
-       :size 13
+       :size 15
        :weight 'light)
       doom-symbol-font
       (font-spec
        :family "CommitMono Nerd Font"
-       :size 13
+       :size 15
        :weight 'light))
 (setq-default line-spacing 6)
 
