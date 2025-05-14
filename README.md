@@ -3,7 +3,5 @@
  
 ## Neovim
 
-The Neovim config is managed by [packer.nvim](https://github.com/wbthomason/packer.nvim).
-
-Since packer.nvim is no longer maintained, this config is broken.
+The Neovim config was originally managed by [packer.nvim](https://github.com/wbthomason/packer.nvim). Now, it is managed by [lazy.nvim](https://github.com/folke/lazy.nvim).
 
