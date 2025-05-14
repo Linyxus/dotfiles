@@ -1,11 +1,16 @@
+[general]
+import = [
+  "~/.config/alacritty/themes/themes/catppuccin_latte.toml"
+]
+
 [cursor.style]
 shape = "Underline"
 
 [font]
-size = 17.0
+size = 14.0
 
 [font.normal]
-family = "Iosevka"
+family = "JetBrains Mono"
 style = "Regular"
 
 [font.offset]
