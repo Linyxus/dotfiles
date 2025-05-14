@@ -7,14 +7,14 @@ import = [
 shape = "Underline"
 
 [font]
-size = 14.0
+size = 13.0
 
 [font.normal]
-family = "JetBrains Mono"
+family = "Iosevka"
 style = "Regular"
 
 [font.offset]
-x = 2
+x = 3
 y = 10
 
 [window.dimensions]
