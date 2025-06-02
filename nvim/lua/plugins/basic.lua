@@ -42,6 +42,7 @@ return {
       vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
       vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
       vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+      vim.keymap.set('n', '<leader>bb', builtin.buffers, {})
     end,
   },
 
@@ -76,4 +77,14 @@ return {
     event = "InsertEnter",
     config = true,
   },
+
+  { 'wakatime/vim-wakatime', lazy = false },
+
+  {
+    "ggandor/leap.nvim",
+    config = function()
+      local leap = require('leap')
+      leap.set_default_mappings()
+    end,
+  }
 }
