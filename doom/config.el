@@ -235,10 +235,4 @@
 
 (setq +latex-viewers '(pdf-tools))
 
-;; (add-to-list 'display-buffer-alist
-;;                  '("^\\*claude"
-;;                    (display-buffer-in-side-window)
-;;                    (side . right)
-;;                    (window-width . 90)))
-
 (set-popup-rule! "^\\*claude" :side 'right :size 0.5)
