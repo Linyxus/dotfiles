@@ -192,6 +192,13 @@
  :leader
  :desc "Open gptel" "og" #'gptel)
 
+;; claude-code
+(use-package! claude-code
+  :defer t)
+(map!
+ :map 'override
+ :desc "Claude Code" "C-c c" #'claude-code-transient)
+
 ;; dotty
 (use-package! dotty
   :after-call scala-mode-hook
@@ -227,3 +234,11 @@
    :desc "New Zetteldeft Note" "nzn" #'zetteldeft-new-file))
 
 (setq +latex-viewers '(pdf-tools))
+
+;; (add-to-list 'display-buffer-alist
+;;                  '("^\\*claude"
+;;                    (display-buffer-in-side-window)
+;;                    (side . right)
+;;                    (window-width . 90)))
+
+(set-popup-rule! "^\\*claude" :side 'right :size 0.5)

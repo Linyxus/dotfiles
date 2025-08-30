@@ -84,3 +84,10 @@
   (:host github
    :repo "leanprover-community/lean4-mode"
    :files ("*.el" "data")))
+
+;; claude-code
+(package! claude-code
+  :recipe (:host github :repo "stevemolitor/claude-code.el"))
+
+;; eat
+(package! eat)
