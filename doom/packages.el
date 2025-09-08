@@ -57,6 +57,10 @@
 (package! ef-themes
   :recipe (:host github :repo "protesilaos/ef-themes"))
 
+;; doric themes
+(package! doric-themes
+  :recipe (:host github :repo "protesilaos/doric-themes"))
+
 ;; Wakatime
 (package! wakatime-mode
   :recipe (:host github :repo "wakatime/wakatime-mode"))
