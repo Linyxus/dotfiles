@@ -10,7 +10,7 @@ shape = "Underline"
 size = 12.0
 
 [font.normal]
-family = "Maple Mono NF CN"
+family = "CommitMono Nerd Font"
 style = "Regular"
 
 [font.offset]

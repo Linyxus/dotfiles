@@ -9,6 +9,14 @@ return {
   },
 
   {
+    "https://github.com/neovim/nvim-lspconfig",
+    lazy = false,
+    config = function()
+      vim.lsp.enable('texlab')
+    end,
+  },
+
+  {
     "dstein64/vim-startuptime",
     cmd = "StartupTime",
     init = function()
