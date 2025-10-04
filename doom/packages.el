@@ -61,6 +61,10 @@
 (package! doric-themes
   :recipe (:host github :repo "protesilaos/doric-themes"))
 
+;; standard themes
+(package! standard-themes
+  :recipe (:host github :repo "protesilaos/standard-themes"))
+
 ;; Wakatime
 (package! wakatime-mode
   :recipe (:host github :repo "wakatime/wakatime-mode"))
