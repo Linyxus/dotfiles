@@ -1,6 +1,6 @@
 [general]
 import = [
-  "~/.config/alacritty/ef-themes/themes/ef-maris-light.toml"
+  "~/.config/alacritty/ef-themes/themes/modus-operandi.toml"
 ]
 
 [cursor.style]

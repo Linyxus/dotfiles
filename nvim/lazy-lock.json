@@ -2,7 +2,7 @@
   "diffview.nvim": { "branch": "main", "commit": "4516612fe98ff56ae0415a259ff6361a89419b0a" },
   "lazy.nvim": { "branch": "main", "commit": "59334064f8604ca073791c25dcc5c9698865406e" },
   "leap.nvim": { "branch": "main", "commit": "ce65ca3563647a73c7e5555e0c94eed1317d2d83" },
-  "neo-tree.nvim": { "branch": "main", "commit": "f14ac20f98fb62769eaf4de1dc69fbee5fcf3384" },
+  "neo-tree.nvim": { "branch": "main", "commit": "96bb26de7c9b0665518af7d841742b049b411722" },
   "neogit": { "branch": "master", "commit": "90dcfa7b2bd5f3f35d1a7afe24dde9e2bc482cd4" },
   "nui.nvim": { "branch": "main", "commit": "de740991c12411b663994b2860f1a4fd0937c130" },
   "nvim-autopairs": { "branch": "master", "commit": "23320e75953ac82e559c610bec5a90d9c6dfa743" },
