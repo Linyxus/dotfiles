@@ -23,17 +23,18 @@
 ;;
 ;; (setq doom-font (font-spec :family "CommitMono" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
+(setq font-name "CommitMono")
 (setq doom-font
       (font-spec
-       :family "Maple Mono NF CN"
+       :family font-name
        :size 13
        :weight 'light)
       doom-symbol-font
       (font-spec
-       :family "Maple Mono NF CN"
+       :family font-name
        :size 13
        :weight 'light))
-(setq-default line-spacing 6)
+(setq-default line-spacing 8)
 
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them

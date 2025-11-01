@@ -1,16 +1,16 @@
 [general]
 import = [
-  "~/.config/alacritty/ef-themes/themes/modus-operandi.toml"
+  "~/.config/alacritty/ef-themes/themes/modus-vivendi-tinted.toml"
 ]
 
 [cursor.style]
 shape = "Underline"
 
 [font]
-size = 12.0
+size = 12
 
 [font.normal]
-family = "CommitMono Nerd Font"
+family = "JuliaMono"
 style = "Regular"
 
 [font.offset]
