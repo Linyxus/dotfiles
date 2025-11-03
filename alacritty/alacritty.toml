@@ -20,3 +20,6 @@ y = 10
 [window.dimensions]
 columns = 135
 lines = 35
+
+[window]
+decorations = "Buttonless"
