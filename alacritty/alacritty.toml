@@ -10,16 +10,17 @@ shape = "Underline"
 size = 12
 
 [font.normal]
-family = "JuliaMono"
+family = "CommitMono"
 style = "Regular"
 
 [font.offset]
 x = 2
-y = 10
+y = 12
 
 [window.dimensions]
 columns = 135
 lines = 35
 
 [window]
-decorations = "Buttonless"
+decorations = "Full"
+decorations_theme_variant = "Dark"
