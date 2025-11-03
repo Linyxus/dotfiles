@@ -13,6 +13,7 @@ return {
     lazy = false,
     config = function()
       vim.lsp.enable('texlab')
+      vim.lsp.enable('tinymist')
     end,
   },
 
@@ -94,5 +95,12 @@ return {
       local leap = require('leap')
       leap.set_default_mappings()
     end,
+  },
+
+  {
+    'chomosuke/typst-preview.nvim',
+    lazy = false, -- or ft = 'typst'
+    version = '1.*',
+    opts = {}, -- lazy.nvim will implicitly calls `setup {}`
   }
 }
