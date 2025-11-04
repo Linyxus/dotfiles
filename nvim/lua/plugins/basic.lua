@@ -79,6 +79,14 @@ return {
       { "<leader>gs", "<cmd>Neogit<cr>", desc = "Neogit" },
       { "<leader>gg", "<cmd>Neogit<cr>", desc = "Neogit" },
     },
+    opts = {
+      mappings = {
+        popup = {
+          P = "PullPopup",
+          p = "PushPopup",
+        },
+      },
+    },
   },
 
   {

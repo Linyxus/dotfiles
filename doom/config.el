@@ -34,7 +34,7 @@
        :family font-name
        :size 13
        :weight 'light))
-(setq-default line-spacing 8)
+(setq-default line-spacing 10)
 
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
