@@ -82,8 +82,11 @@ return {
     opts = {
       mappings = {
         popup = {
-          P = "PullPopup",
           p = "PushPopup",
+          f = "FetchPopup",
+          F = "PullPopup",
+          _ = "RevertPopup",
+          O = "ResetPopup",
         },
       },
     },
