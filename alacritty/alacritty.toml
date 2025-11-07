@@ -14,7 +14,7 @@ family = "CommitMono"
 style = "Regular"
 
 [font.offset]
-x = 2
+x = 3
 y = 12
 
 [window.dimensions]
