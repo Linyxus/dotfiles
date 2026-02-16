@@ -49,21 +49,16 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
 
-;; modus themes
+;; many themes
 (package! modus-themes
   :recipe (:host github :repo "protesilaos/modus-themes"))
-
-;; EF themes
 (package! ef-themes
   :recipe (:host github :repo "protesilaos/ef-themes"))
-
-;; doric themes
 (package! doric-themes
   :recipe (:host github :repo "protesilaos/doric-themes"))
-
-;; standard themes
 (package! standard-themes
   :recipe (:host github :repo "protesilaos/standard-themes"))
+(package! catppuccin-theme)
 
 ;; Wakatime
 (package! wakatime-mode
@@ -99,3 +94,4 @@
 
 ;; eat
 (package! eat)
+
