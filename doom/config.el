@@ -23,16 +23,16 @@
 ;;
 ;; (setq doom-font (font-spec :family "CommitMono" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
-(setq font-name "CommitMono Nerd Font")
+(setq font-name "CommitMono")
 (setq doom-font
       (font-spec
        :family font-name
-       :size 13
+       :size 15
        :weight 'light)
       doom-symbol-font
       (font-spec
        :family font-name
-       :size 13
+       :size 15
        :weight 'light))
 (setq-default line-spacing 10)
 
@@ -47,7 +47,7 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'catppuccin)
+(setq doom-theme 'standard-adwaita)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
