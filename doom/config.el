@@ -47,7 +47,7 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'standard-adwaita)
+(setq doom-theme 'standard-wombat)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -220,6 +220,9 @@
 
 (after! lsp-mode
   (setq-default lsp-enable-file-watchers nil))
+
+(after! evil-escape
+  (setq evil-escape-key-sequence "fd"))
 
 ;; zetteldeft
 (use-package! zetteldeft
