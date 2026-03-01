@@ -27,7 +27,7 @@
       (font-spec
        :family "Iosevka"
        :size 16
-       :weight 'light
+       :weight 'regular
        :width 'expanded)
       doom-symbol-font
       (font-spec
