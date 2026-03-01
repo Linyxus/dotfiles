@@ -23,16 +23,16 @@
 ;;
 ;; (setq doom-font (font-spec :family "CommitMono" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
-(setq font-name "Maple Mono")
+(setq font-name "Maple Mono NF CN")
 (setq doom-font
       (font-spec
        :family font-name
-       :size 14
+       :size 16
        :weight 'light)
       doom-symbol-font
       (font-spec
        :family font-name
-       :size 14
+       :size 16
        :weight 'light))
 (setq-default line-spacing 10)
 
