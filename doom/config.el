@@ -25,14 +25,14 @@
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
 (setq doom-font
       (font-spec
-       :family "Iosevka"
-       :size 16
-       :weight 'regular
+       :family "Maple Mono"
+       :size 15
+       :weight 'semi-light
        :width 'expanded)
       doom-symbol-font
       (font-spec
        :family "Symbols Nerd Font Mono"
-       :size 16))
+       :size 15))
 (setq-default line-spacing 10)
 
 (setq-default tab-width 2)
