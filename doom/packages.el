@@ -95,3 +95,6 @@
 ;; eat
 (package! eat)
 
+;; auto treesitter mode
+(package! treesit-auto)
+
