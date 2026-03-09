@@ -241,10 +241,3 @@
 (setq +latex-viewers '(pdf-tools))
 
 (set-popup-rule! "^\\*claude" :side 'right :size 0.5)
-
-(use-package! treesit-auto
-  :custom
-  (treesit-auto-install 'prompt)
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
