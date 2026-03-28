@@ -241,3 +241,5 @@
 (setq +latex-viewers '(pdf-tools))
 
 (set-popup-rule! "^\\*claude" :side 'right :size 0.5)
+
+(add-to-list 'default-frame-alist '(undecorated-round . t))
