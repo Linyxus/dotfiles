@@ -27,17 +27,8 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter",
-    build = "<cmd>TSUpdate<cr>",
-    config = function ()
-      require('nvim-treesitter.configs').setup {
-        ensure_installed = { "lua", "scala" },
-        sync_install = false,
-        auto_install = true,
-        highlight = {
-          enable = true,
-        },
-      }
-    end
+    lazy = false,
+    build = ":TSUpdate"
   },
 
   {
