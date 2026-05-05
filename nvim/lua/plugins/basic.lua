@@ -92,7 +92,7 @@ return {
   { 'wakatime/vim-wakatime', lazy = false },
 
   {
-    url = "https://codeberg.org/andyg/leap.nvim",
+    url = "https://git.disroot.org/andyg/leap.nvim",
     config = function()
       vim.keymap.set({'n', 'x', 'o'}, 'gs', '<Plug>(leap)')
     end,
