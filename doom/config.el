@@ -25,7 +25,7 @@
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
 (setq doom-font
       (font-spec
-       :family "Maple Mono"
+       :family "Google Sans Code"
        :size 15
        :weight 'semi-light
        :width 'expanded)
