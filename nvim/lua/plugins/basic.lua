@@ -1,10 +1,25 @@
 return {
   {
-    "folke/tokyonight.nvim",
+    "miikanissi/modus-themes.nvim",
     lazy = false,
     priority = 1000,
     config = function()
-      vim.cmd([[colorscheme tokyonight]])
+      require("modus-themes").setup({
+        style = "auto", -- "auto" (follow background), "modus_operandi" (light), "modus_vivendi" (dark)
+        variants = { -- "default", "tinted", "deuteranopia", "tritanopia"
+          modus_operandi = "default",
+          modus_vivendi = "default",
+        },
+        transparent = false,
+        dim_inactive = false,
+        styles = {
+          comments = { italic = true },
+          keywords = { italic = false },
+          functions = {},
+          variables = {},
+        },
+      })
+      vim.cmd([[colorscheme modus]])
     end,
   },
 
@@ -103,5 +118,24 @@ return {
     lazy = false, -- or ft = 'typst'
     version = '1.*',
     opts = {}, -- lazy.nvim will implicitly calls `setup {}`
+  },
+
+  {
+    'Julian/lean.nvim',
+    event = { 'BufReadPre *.lean', 'BufNewFile *.lean' },
+
+    dependencies = {
+      'nvim-telescope/telescope.nvim', -- for Lean-specific pickers
+      'andymass/vim-matchup',          -- for enhanced % motion behavior
+      'andrewradev/switch.vim',        -- for switch support
+      'tomtom/tcomment_vim',           -- for commenting
+    },
+
+    init = function()
+      ---@type lean.Config
+      vim.g.lean_config = {
+        mappings = true,
+      }
+    end,
   }
 }
