@@ -26,13 +26,13 @@
 (setq doom-font
       (font-spec
        :family "Google Sans Code"
-       :size 15
+       :size 13
        :weight 'semi-light
        :width 'expanded)
       doom-symbol-font
       (font-spec
        :family "Symbols Nerd Font Mono"
-       :size 15))
+       :size 13))
 (setq-default line-spacing 10)
 
 (setq-default tab-width 2)
