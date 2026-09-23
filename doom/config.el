@@ -23,16 +23,17 @@
 ;;
 ;; (setq doom-font (font-spec :family "CommitMono" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
+(setq doom-font-size 13.5)
 (setq doom-font
       (font-spec
-       :family "Google Sans Code"
-       :size 13
+       :family "Paper Mono"
+       :size doom-font-size
        :weight 'semi-light
        :width 'expanded)
       doom-symbol-font
       (font-spec
        :family "Symbols Nerd Font Mono"
-       :size 13))
+       :size doom-font-size))
 (setq-default line-spacing 10)
 
 (setq-default tab-width 2)

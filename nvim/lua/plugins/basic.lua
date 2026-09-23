@@ -120,22 +120,20 @@ return {
     opts = {}, -- lazy.nvim will implicitly calls `setup {}`
   },
 
+  -- Lean 4 syntax highlighting, ftplugin and unicode abbreviations only;
+  -- the language server is disabled.
   {
     'Julian/lean.nvim',
     event = { 'BufReadPre *.lean', 'BufNewFile *.lean' },
-
-    dependencies = {
-      'nvim-telescope/telescope.nvim', -- for Lean-specific pickers
-      'andymass/vim-matchup',          -- for enhanced % motion behavior
-      'andrewradev/switch.vim',        -- for switch support
-      'tomtom/tcomment_vim',           -- for commenting
-    },
-
     init = function()
       ---@type lean.Config
       vim.g.lean_config = {
-        mappings = true,
+        lsp = { enable = false },        -- never start `lake serve` / `lean --server`
+        infoview = { autoopen = false }, -- otherwise an empty infoview split still opens
+        graphics = { enabled = false },  -- skip the Kitty image check; only server widgets use it
+        inlay_hint = { enabled = false },
+        stderr = { enable = false },
       }
     end,
-  }
+  },
 }
