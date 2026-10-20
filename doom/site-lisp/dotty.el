@@ -755,4 +755,234 @@ If ARG is non-nil, do not ask about saving (mimicks behaviour of `save-some-buff
 
 (advice-add 'comint-send-input :around 'sbt//comint-send-input-advice)
 
+;;; Mill
+;;
+;; Mill keeps its own long-lived daemon, so unlike the sbt integration above there is no console
+;; to drive and no prompt to wait for: every command is a short-lived `./mill' client process,
+;; which reports success through its exit status. Commands run asynchronously, streaming into the
+;; output buffer; the `-for-output' variants block until Mill is done and return the output.
+;;
+;; `./mill scalac' depends on the compiler, so editing the compiler and recompiling a test file is
+;; a single command: Mill rebuilds whatever is out of date first.
+
+(defcustom mill/command '("./mill" "--ticker" "false" "--color" "false")
+  "Program and leading arguments used to invoke Mill, run from the project root."
+  :type '(repeat string)
+  :group 'dotty)
+
+(defvar mill/compile-arguments "-color:never"
+  "Compiler arguments used by `mill/compile-file'.")
+
+(defvar mill/scalac-task "scalac"
+  "Mill command used to compile files.
+\"scalac\" runs the non-bootstrapped compiler,
+\"scala3-bootstrapped.scalac\" the bootstrapped one.")
+
+(defvar mill/test-task "testCompilation"
+  "Mill command used by `mill/test'.
+\"testCompilation\" tests the non-bootstrapped compiler,
+\"scala3-bootstrapped.testCompilation\" the bootstrapped one.")
+
+(defvar mill/last-arguments nil
+  "Arguments of the last Mill invocation, for `mill/repeat-last-command'.")
+
+(defvar mill//command-history nil
+  "History of `mill/send-command'.")
+
+(defvar-local mill/output/arguments nil
+  "Mill arguments that produced the output in this buffer.")
+
+(defvar-local mill/output/process nil
+  "Mill process writing to this buffer.")
+
+(defvar-local mill/output/exit-code nil
+  "Exit code of the Mill command whose output is in this buffer.
+nil while the command runs.")
+
+(defvar-local mill/output/start-time nil
+  "Time at which the Mill command whose output is in this buffer was started.")
+
+(defun mill//project-root ()
+  (or (locate-dominating-file default-directory "build.mill")
+      (user-error "Not in a Mill project (no build.mill above %s)" default-directory)))
+
+(defun mill//command-line (root args)
+  "The command line running Mill with ARGS in ROOT.
+`make-process' looks programs up in `exec-path' only, so a relative path
+such as \"./mill\" is resolved against ROOT here."
+  (let ((program (car mill/command)))
+    (append (list (if (string-match-p "/" program) (expand-file-name program root) program))
+            (cdr mill/command)
+            args)))
+
+(defun mill/buffer-name (&optional root)
+  (format "*mill<%s>-output*"
+          (file-name-nondirectory (directory-file-name (or root (mill//project-root))))))
+
+(defun mill//filter (proc string)
+  "Append Mill output to the process buffer, keeping windows at its end scrolling."
+  (let ((buf (process-buffer proc)))
+    (when (buffer-live-p buf)
+      (with-current-buffer buf
+        (let* ((mark (process-mark proc))
+               (followers (seq-filter (lambda (win) (>= (window-point win) mark))
+                                      (get-buffer-window-list buf nil t)))
+               (at-end (>= (point) mark)))
+          (save-excursion
+            (goto-char mark)
+            (insert (ansi-color-filter-apply string))
+            (set-marker mark (point)))
+          (when at-end (goto-char mark))
+          (dolist (win followers)
+            (set-window-point win mark)))))))
+
+(defun mill//summarise ()
+  "Report the outcome of the Mill command in the current buffer."
+  (let ((errors 0) (warnings 0) (attentions 0))
+    (save-excursion
+      (goto-char (point-min))
+      (while (not (eobp))
+        (cond ((looking-at (rx bol "-- " (* nonl) "Error:")) (setq errors (1+ errors)))
+              ((looking-at (rx bol "-- " (* nonl) "Warning:")) (setq warnings (1+ warnings)))
+              ((looking-at (rx bol "#!!!")) (setq attentions (1+ attentions))))
+        (forward-line)))
+    (message "Mill %s %s; errors: %s; warnings: %s; attentions: %s"
+             (string-join mill/output/arguments " ")
+             (if (zerop mill/output/exit-code) "succeeded" (format "failed (exit %s)" mill/output/exit-code))
+             errors warnings attentions)))
+
+(defun mill//sentinel (proc _event)
+  (let ((buf (process-buffer proc)))
+    (when (and (not (process-live-p proc))
+               (buffer-live-p buf)
+               ;; Ignore a process superseded by a newer command in the same buffer
+               (eq proc (buffer-local-value 'mill/output/process buf)))
+      (with-current-buffer buf
+        (setq mill/output/exit-code (process-exit-status proc))
+        (save-excursion
+          (goto-char (point-max))
+          (insert (format "\n[mill] %s: exit %s after %.1fs\n"
+                          (string-join mill/output/arguments " ")
+                          mill/output/exit-code
+                          (float-time (time-since mill/output/start-time)))))
+        (hs-hide-all)
+        (mill//summarise)
+        (when-let* ((callback (process-get proc 'mill-callback)))
+          (funcall callback mill/output/exit-code))))))
+
+(defun mill/run (args &optional callback)
+  "Run Mill with the argument list ARGS asynchronously, displaying its output.
+A command still running in the output buffer is interrupted first.
+CALLBACK, if non-nil, is called with the exit code in the output buffer
+when Mill finishes. Return the process."
+  (dotty//projectile/save-project-files)
+  (let* ((root (mill//project-root))
+         (buf (get-buffer-create (mill/buffer-name root))))
+    (with-current-buffer buf
+      (when (process-live-p mill/output/process)
+        (message "Interrupting Mill %s" (string-join mill/output/arguments " "))
+        ;; Forget the process first: `delete-process' runs its sentinel right away
+        (let ((old mill/output/process))
+          (setq mill/output/process nil)
+          (delete-process old)))
+      (unless (eq major-mode 'dotty-trace-mode)
+        (dotty-trace-mode))
+      (erase-buffer)
+      (setq default-directory root
+            mill/output/arguments args
+            mill/output/exit-code nil
+            mill/output/start-time (current-time)
+            mill/output/process
+            (make-process :name "mill"
+                          :buffer buf
+                          :command (mill//command-line root args)
+                          :connection-type 'pipe
+                          :noquery t
+                          :filter #'mill//filter
+                          :sentinel #'mill//sentinel))
+      (process-put mill/output/process 'mill-callback callback)
+      (setq mill/last-arguments args)
+      (display-buffer buf)
+      mill/output/process)))
+
+(defun mill//wait (proc)
+  "Block until the Mill process PROC is done; return its exit code."
+  (let ((buf (process-buffer proc)))
+    (while (null (buffer-local-value 'mill/output/exit-code buf))
+      (accept-process-output proc 0.1)
+      (redisplay))
+    (buffer-local-value 'mill/output/exit-code buf)))
+
+(defun mill/run-for-output (args)
+  "Run Mill with the argument list ARGS; wait for it and return its output."
+  (let ((proc (mill/run args)))
+    (mill//wait proc)
+    (with-current-buffer (process-buffer proc)
+      (buffer-substring-no-properties (point-min) (point-max)))))
+
+(defun mill//compile-arguments (files args task)
+  (append (list (or task mill/scalac-task))
+          (split-string-shell-command (or args mill/compile-arguments))
+          files))
+
+(defun mill/compile-files (files &optional args task)
+  "Compile FILES, relative to the project root, with compiler arguments ARGS.
+TASK is the Mill command to use, `mill/scalac-task' by default.
+Runs asynchronously."
+  (mill/run (mill//compile-arguments files args task)))
+
+(defun mill/compile-files-for-output (files &optional args task)
+  "Like `mill/compile-files', but wait for the compiler and return its output."
+  (mill/run-for-output (mill//compile-arguments files args task)))
+
+(defun mill/compile-file (file)
+  "Compile FILE with `mill/scalac-task' and `mill/compile-arguments'."
+  (interactive (list (read-file-name "Mill compile: " nil nil t)))
+  (let ((root (mill//project-root)))
+    (mill/compile-files (list (file-relative-name (expand-file-name file) root)))))
+
+(defun mill/compile-this-file ()
+  (interactive)
+  (unless buffer-file-name
+    (user-error "Buffer is not visiting a file"))
+  (mill/compile-file buffer-file-name))
+
+(defun mill/send-command (command)
+  "Run the Mill COMMAND line (e.g. \"scala3-compiler-bootstrapped.compile\")."
+  (interactive (list (read-string "Mill: " nil 'mill//command-history)))
+  (mill/run (split-string-shell-command command)))
+
+(defun mill/test (filter)
+  "Run `mill/test-task' on the tests whose path contains FILTER."
+  (interactive (list (read-string (format "%s filter: " mill/test-task))))
+  (when (not dotty//prints-commented-out-p)
+    (dotty/toggle-printing-global))
+  (mill/run (cons mill/test-task (split-string-shell-command filter))))
+
+(defun mill/repeat-last-command ()
+  (interactive)
+  (unless mill/last-arguments
+    (user-error "No Mill command was run yet"))
+  (mill/run mill/last-arguments))
+
+(defun mill/output/refresh ()
+  "Re-run the Mill command whose output is in the current buffer."
+  (interactive)
+  (unless mill/output/arguments
+    (user-error "Not a Mill output buffer"))
+  (mill/run mill/output/arguments))
+
+(defun mill/interrupt ()
+  "Interrupt the running Mill command, if any."
+  (interactive)
+  (let ((buf (get-buffer (mill/buffer-name))))
+    (if (and buf (process-live-p (buffer-local-value 'mill/output/process buf)))
+        (interrupt-process (buffer-local-value 'mill/output/process buf))
+      (message "No Mill command running"))))
+
+(defun mill/shutdown ()
+  "Stop the Mill daemon of the current project."
+  (interactive)
+  (mill/run '("shutdown")))
+
 (provide 'dotty)
