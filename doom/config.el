@@ -160,6 +160,25 @@
   (setq org-agenda-start-with-log-mode '(closed clock state)
         org-log-done t))
 
+;; make in the closest enclosing Makefile directory
+(defun my/compile-closest-makefile ()
+  "Run `compile' in the nearest ancestor directory containing a Makefile."
+  (interactive)
+  (let* ((start (or buffer-file-name default-directory))
+         (dir (locate-dominating-file
+               start
+               (lambda (d)
+                 (seq-some (lambda (f) (file-exists-p (expand-file-name f d)))
+                           '("GNUmakefile" "makefile" "Makefile"))))))
+    (unless dir
+      (user-error "No Makefile found above %s" start))
+    (let ((default-directory dir))
+      (call-interactively #'compile))))
+
+(map! :map 'override
+      :leader
+      :desc "Make (closest Makefile)" "cm" #'my/compile-closest-makefile)
+
 ;; neotree kbds
 (map! :map 'override
       :leader
