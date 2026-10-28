@@ -47,7 +47,17 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'standard-adwaita)
+(setq doom-theme 'doom-rose-pine)
+
+;; Follow the macOS appearance: Rosé Pine when dark, Rosé Pine Dawn when light.
+(when (boundp 'ns-system-appearance-change-functions)
+  (add-hook! 'ns-system-appearance-change-functions
+    (defun my/apply-rose-pine-variant-h (appearance)
+      (let ((theme (if (eq appearance 'light) 'doom-rose-pine-dawn 'doom-rose-pine)))
+        (setq doom-theme theme)
+        (unless (custom-theme-enabled-p theme)
+          (mapc #'disable-theme custom-enabled-themes)
+          (load-theme theme t))))))
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.

@@ -59,6 +59,9 @@
 (package! standard-themes
   :recipe (:host github :repo "protesilaos/standard-themes"))
 (package! catppuccin-theme)
+;; Rosé Pine (doom-rose-pine, -moon, -dawn)
+(package! doom-rose-pine-themes
+  :recipe (:local-repo "site-lisp/doom-rose-pine-themes"))
 
 ;; Wakatime
 (package! wakatime-mode
