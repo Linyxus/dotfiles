@@ -15,18 +15,19 @@ Evidence, strongest first:
   zcode    a zcode-rs session that was closed at the crash, matched by cwd.
   codex    the newest Codex rollout for the pane's cwd (weak).
 
-Usage: plan.py [--json] [--days N]
+Usage: plan.py [--json] [--days N] [--crash-time EPOCH]
 """
 
 import glob
 import json
 import os
 import re
+import shlex
 import sqlite3
 import subprocess
 import sys
 import time
-from collections import Counter, defaultdict
+from collections import defaultdict
 from datetime import datetime
 
 HOME = os.path.expanduser("~")
@@ -36,6 +37,20 @@ UUID = r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 RESUME_RE = re.compile(
     r"(claude (?:--resume|-r) " + UUID + r"|codex resume " + UUID +
     r"|zcode-rs --resume sess_" + UUID + r"|pcl --resume " + UUID + r")")
+
+
+def agent_command(cmd):
+    """Normalise an agent resume command (pcl/cl/claude flags...) to the canonical form."""
+    m = re.search(r"\b(?:claude|pcl|cl)\b.*?(?:--resume|-r) (" + UUID + ")", cmd)
+    if m:
+        return f"claude --resume {m.group(1)}"
+    m = re.search(r"\bcodex\b.*?\bresume (" + UUID + ")", cmd)
+    if m:
+        return f"codex resume {m.group(1)}"
+    m = re.search(r"\bzcode-rs\b.*?--resume (sess_" + UUID + ")", cmd)
+    if m:
+        return f"zcode-rs --resume {m.group(1)}"
+    return None
 
 
 def rex(*args):
@@ -101,23 +116,55 @@ def snapshot_commands(who):
     return out
 
 
-def server_history(who, since):
-    """Restart events and crash signals from the server log."""
+def server_history(who):
+    """Restart events and crash signals from the server log: [(ts, kind, detail, prev_ts)]."""
     events, last_ts = [], None
     ts_re = re.compile(r"^(\d{4}/\d\d/\d\d \d\d:\d\d:\d\d) ")
     with open(who["log_path"], errors="replace") as f:
         for line in f:
             m = ts_re.match(line)
             if m:
-                last_ts = time.mktime(time.strptime(m.group(1), "%Y/%m/%d %H:%M:%S"))
+                ts = time.mktime(time.strptime(m.group(1), "%Y/%m/%d %H:%M:%S"))
                 if "restored saved sessions" in line:
                     clean = "clean_shutdown=true" in line
-                    events.append((last_ts, "start", "after clean stop" if clean else "AFTER CRASH"))
+                    events.append((ts, "start", "after clean stop" if clean else "AFTER CRASH", last_ts))
                 elif "Rex server stopped" in line:
-                    events.append((last_ts, "stop", "clean"))
+                    events.append((ts, "stop", "clean", last_ts))
+                last_ts = ts
             elif re.match(r"^(SIG[A-Z]+: |fatal error: |panic: )", line):
-                events.append((last_ts, "crash", line.strip() + " (time = last log line before it)"))
-    return [e for e in events if e[0] and e[0] >= since]
+                events.append((last_ts, "crash", line.strip() + " (time = last log line before it)", last_ts))
+    return events
+
+
+def death_windows(events):
+    """When running programs were killed, one (lo, hi, kind) per restart.
+
+    Clean stop: around the stop. Crash: between the last log line before the
+    crash and the restart (the log can be quiet for a while before a crash).
+    Returns (recent, older): `recent` are the windows that ended the last
+    long-lived server instance plus any crash loop after it."""
+    wins, stop, crash, prev_start = [], None, None, None
+    for ts, kind, _, prev_ts in events:
+        if kind == "stop":
+            stop = ts
+        elif kind == "crash":
+            crash = ts
+        elif kind == "start":
+            if prev_start is not None:
+                if stop is not None:
+                    wins.append((stop - 5, ts + 5, "clean restart", prev_start))
+                else:
+                    lo = crash if crash is not None else (prev_ts or ts)
+                    wins.append((lo - 5, ts + 5, "crash", prev_start))
+            stop = crash = None
+            prev_start = ts
+    recent = []
+    for w in reversed(wins):
+        recent.append(w)
+        if w[0] - w[3] > 120:      # the instance before this window lived > 2 min
+            break
+    older = [w for w in wins if w not in recent]
+    return recent, older
 
 
 # ---------------------------------------------------------------- evidence
@@ -167,17 +214,19 @@ def chain_evidence(scans, block_ids):
     found = {}
     for f, mt, _, lines in scans:
         for ln in lines:
-            cmd = RESUME_RE.search(ln)
-            if not cmd:
-                continue
-            for s, b in short.items():
-                if s in ln and (b not in found or found[b][0] < mt):
-                    found[b] = (mt, cmd.group(1), f)
+            # one hit can span several commands; judge each command on its own
+            for seg in re.split(r"(?=rex send )|;|&&|\\n", ln):
+                cmd = RESUME_RE.search(seg)
+                if not cmd:
+                    continue
+                for s, b in short.items():
+                    if s in seg and (b not in found or found[b][0] < mt):
+                        found[b] = (mt, agent_command(cmd.group(1)) or cmd.group(1), f)
     return found
 
 
-def zcode_closed_at(crash_ts):
-    """zcode sessions whose last log event is a close near the crash -> {sess: (ts, cwd)}."""
+def zcode_closed_at(windows):
+    """zcode sessions whose last log event is a close inside a kill window -> {sess: (ts, cwd)}."""
     out = {}
     for log in sorted(glob.glob(f"{HOME}/.zcode/rust-cli/log/zcode-*.jsonl"))[-2:]:
         last = {}
@@ -192,7 +241,7 @@ def zcode_closed_at(crash_ts):
                 last[e.get("sessionId")] = e
         for sess, e in last.items():
             ts = datetime.fromisoformat(e["timestamp"].replace("Z", "+00:00")).timestamp()
-            if e.get("event") == "session.closing" and crash_ts and abs(ts - crash_ts) < 10:
+            if e.get("event") == "session.closing" and any(lo <= ts <= hi for lo, hi, *_ in windows):
                 cwd = None
                 ro = f"{HOME}/.zcode/cli/rollout/model-io-{sess}.jsonl"
                 if os.path.exists(ro):
@@ -240,42 +289,48 @@ def main():
     who, panes, sessions = live_state()
     block_ids = {p["block_id"] for p in panes}
     snap = snapshot_commands(who)
-    hist = server_history(who, time.time() - 86400)
+    events = server_history(who)
+    hist = [e[:3] for e in events if e[0] and e[0] >= time.time() - 86400]
+    recent, older = death_windows(events)
+    if "--crash-time" in sys.argv:     # manual override: epoch seconds
+        t = float(sys.argv[sys.argv.index("--crash-time") + 1])
+        recent, older = [(t - 5, t + 5, "manual", t)], []
     scans = scan_all(recent_transcripts(since))
     claude = claude_evidence(scans, block_ids)
     chain = chain_evidence(scans, block_ids)
-
-    # Crash time: Claude writes its transcript when killed, so the transcripts
-    # that were live at the crash share an mtime.
-    newest = [round(v[0][0]) for b, v in claude.items()]
-    crash_ts = None
-    if newest:
-        buckets = Counter(t // 3 for t in newest)
-        top, n = buckets.most_common(1)[0]
-        if n >= 2:
-            crash_ts = max(t for t in newest if t // 3 == top)
-
-    zcode = zcode_closed_at(crash_ts)
+    zcode = zcode_closed_at(recent)
     codex = codex_by_cwd()
+
+    def in_win(t, wins):
+        return next((w for w in wins if w[0] <= t <= w[1]), None)
 
     plan = []
     for p in panes:
         cands = []
         for mt, sid, path in claude.get(p["block_id"], [])[:3]:
-            live = crash_ts is not None and abs(mt - crash_ts) <= 5
+            if in_win(mt, recent):
+                conf, note = "high", "running when the server went down"
+            elif in_win(mt, older):
+                conf, note = "low", f"killed by an earlier restart ({fmt_ts(in_win(mt, older)[1])}) and not resumed since"
+            else:
+                conf, note = "low", "last written outside any restart window: probably exited before"
             cands.append({"source": "claude", "cmd": f"claude --resume {sid}", "mtime": mt,
-                          "confidence": "high" if live else "low",
-                          "note": "live at crash" if live else "transcript not written at crash; may have exited earlier",
-                          "path": path})
+                          "confidence": conf, "note": note, "path": path})
         if p["block_id"] in chain:
             mt, cmd, path = chain[p["block_id"]]
             cands.append({"source": "chain", "cmd": cmd, "mtime": mt, "confidence": "medium",
                           "note": "typed into this pane by an earlier recovery", "path": path})
         sc = (snap.get(p["block_id"]) or {}).get("command")
         if sc:
-            cmd = " ".join(sc[2:]) if sc[:2] in (["fish", "-c"], ["sh", "-c"], ["zsh", "-c"]) else " ".join(sc)
-            cands.append({"source": "snapshot", "cmd": cmd, "mtime": None, "confidence": "medium",
-                          "note": "original launch command (pane may have moved on since)"})
+            inner = sc[2] if len(sc) == 3 and sc[1] == "-c" and os.path.basename(sc[0]) in SHELLS else None
+            raw = inner if inner is not None else shlex.join(sc)
+            agent = agent_command(raw)
+            if agent:
+                cands.append({"source": "snapshot", "cmd": agent, "mtime": None, "confidence": "medium",
+                              "note": f"original launch command: {raw}"})
+            else:
+                cands.append({"source": "snapshot", "cmd": raw, "mtime": None, "confidence": "low",
+                              "note": "original launch command, not an agent: re-run only if long-running (server, editor, monitor)"})
         plan.append({**p, "candidates": cands})
 
     # cwd-based matches for panes without block-exact evidence
@@ -284,11 +339,11 @@ def main():
         if any(c["cmd"] == cmd for e in plan for c in e["candidates"]):
             continue
         targets = [e for e in plan if e["cwd"] == cwd and not e["self"]
-                   and not any(c["confidence"] == "high" for c in e["candidates"])]
+                   and not any(c["confidence"] in ("high", "medium") for c in e["candidates"])]
         for e in targets:
             e["candidates"].append({"source": "zcode", "cmd": cmd, "mtime": ts,
                                     "confidence": "medium" if len(targets) == 1 else "low",
-                                    "note": "zcode-rs session closed at the crash, same cwd"
+                                    "note": "zcode-rs session closed when the server went down, same cwd"
                                             + ("" if len(targets) == 1 else f"; {len(targets)} panes share this cwd")})
     for e in plan:
         if not e["candidates"] and e["cwd"] in codex and not e["self"]:
@@ -299,19 +354,23 @@ def main():
     rank = {"high": 0, "medium": 1, "low": 2}
     for e in plan:
         e["candidates"].sort(key=lambda c: (rank[c["confidence"]], -(c["mtime"] or 0)))
+        top = e["candidates"][0] if e["candidates"] else None
         if e["self"]:
             e["action"] = "self (cannot resume itself; report the top candidate to the user)"
         elif not e["is_shell"]:
             e["action"] = f"skip: already running {e['fg']}"
-        elif not e["candidates"]:
+        elif not top:
             e["action"] = "none: no evidence (likely a plain shell)"
+        elif top["confidence"] == "low":
+            e["action"] = "review: only weak evidence, leave as a shell unless the candidate checks out"
         else:
-            e["action"] = e["candidates"][0]["cmd"]
+            e["action"] = top["cmd"]
 
     labels = label_history(scans, set(sessions))
     result = {"server": {"pid": who.get("pid"), "started_at": who.get("started_at"),
                          "version": who.get("rex_version"), "log": who["log_path"]},
-              "crash_time_estimate": crash_ts, "history_24h": hist, "panes": plan,
+              "kill_windows": [{"from": w[0], "to": w[1], "kind": w[2]} for w in recent],
+              "history_24h": hist, "panes": plan,
               "labels": {sid: {"current": sessions[sid], "seen": labels.get(sid, {})} for sid in sessions}}
 
     if as_json:
@@ -319,7 +378,8 @@ def main():
         return
 
     print(f"Rex server pid {who.get('pid')} started {who.get('started_at')}  ({who.get('rex_version')})")
-    print(f"Estimated crash time (Claude transcripts killed together): {fmt_ts(crash_ts)}")
+    for lo, hi, kind, _ in recent:
+        print(f"Programs were killed by a {kind} between {fmt_ts(lo)} and {fmt_ts(hi)}")
     print("\nServer events, last 24h:")
     for ts, kind, detail in hist:
         print(f"  {fmt_ts(ts)}  {kind:5}  {detail}")

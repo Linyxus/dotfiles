@@ -22,32 +22,37 @@ label. If you already renamed it in this conversation, put the old label back
 python3 ~/.claude/skills/recover-rex/scripts/plan.py          # add --json for machine-readable
 ```
 
-It changes nothing. It prints the server's restart and crash history, then one
-entry per pane with an `ACTION` line and ranked candidates:
+It changes nothing. It reads the server log to find when running programs
+were killed (the crash or restart windows), then prints one entry per pane:
+an `ACTION` line and ranked candidates.
 
 | source | evidence | trust |
 |---|---|---|
-| `claude` | the last `REX_BLOCK` the Claude startup hook recorded in a transcript is this pane. `high` = transcript written at the crash (the process was killed while running) | high/low |
+| `claude` | the last `REX_BLOCK` the Claude startup hook recorded in a transcript is this pane. `high` if the transcript was last written inside the kill window, which Claude does when it's killed. `low` otherwise (it exited earlier, or was killed by an older restart and never resumed) | high/low |
 | `chain` | an earlier recovery agent typed this resume command into this pane | medium |
-| `snapshot` | the pane's original launch command from Rex's `snapshot.db` (the pane may have moved on since) | medium |
-| `zcode` | zcode-rs session closed at the crash, same cwd | medium/low |
+| `snapshot` | the pane's original launch command from Rex's `snapshot.db`. Agent commands are normalised to their resume form. Anything else (dev servers, editors, one-shot commands) is `low` | medium/low |
+| `zcode` | zcode-rs session closed in the kill window, same cwd. `low` if several panes share the cwd | medium/low |
 | `codex` | newest Codex rollout for this cwd | low |
 
-The planner already skips panes that aren't at a shell prompt (already
-recovered or in use) and your own pane (`self`).
+`ACTION` is the top candidate when it's high or medium. When only low
+candidates exist it says `review`, so leave that pane as a shell unless you
+confirm the candidate. Panes that aren't at a shell prompt (already recovered or
+in use) are skipped, and so is your own pane (`self`).
+
+If the log doesn't show the restart (for example, it was rotated), pass
+`--crash-time <epoch seconds>`.
 
 ## 2. Decide each pane
 
-- **high** → resume it.
-- No high candidate, but a `chain` or `snapshot` candidate → use it. If
-  several disagree, prefer the newest evidence. When unsure, read the
-  transcript's last messages: did the user `/exit` on purpose, or is it a
-  real working session?
-- Only **low** candidates → usually the pane was a plain shell, or its agent had
-  exited before the crash. Leave it alone unless the transcript shows it was
-  still in use. List these in the report instead of guessing.
-- A tiny transcript (~10K) may only be a stub that `/resume`d into another
-  session. Resume the session it continued into.
+- **Resume the `ACTION` command** for high/medium panes. If two medium
+  candidates disagree, prefer the newest evidence.
+- **`review` panes:** read the candidate transcript's last messages. Resume
+  only if it was clearly still in use. A non-agent snapshot command should only
+  be re-run if it's long-running (a dev server, `tail -f`, an editor), never a
+  one-shot command like `git push`, a deploy, or a test run. Otherwise list the
+  pane in the report.
+- **Stub transcripts:** a tiny transcript (~10K) may only be a stub that
+  `/resume`d into another session. Resume the session it continued into.
 - Ask the user only if a pane is still ambiguous after this. Don't ask for
   confirmation of the obvious ones.
 
