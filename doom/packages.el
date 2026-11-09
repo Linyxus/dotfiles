@@ -97,3 +97,6 @@
 
 ;; eat
 (package! eat)
+
+;; ghostel (libghostty-vt terminal)
+(package! ghostel)

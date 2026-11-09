@@ -195,10 +195,42 @@
       "0" #'+neotree/find-this-file
       "ft" #'+neotree/open)
 
-;; vterm kbds
+;; ghostel: libghostty-vt terminal (replaces vterm)
+(use-package! ghostel
+  :defer t
+  :commands (ghostel ghostel-new ghostel-project)
+  :init
+  ;; keep the native module outside straight's tree so `doom sync` can't wipe it
+  (setq ghostel-module-directory (expand-file-name "ghostel/" doom-user-dir)
+        ghostel-module-auto-install 'download)
+  :config
+  (set-popup-rule! "^\\*doom:ghostel-popup" :size 0.25 :vslot -4 :select t :quit nil :ttl nil))
+
+(defun my/ghostel-toggle (arg)
+  "Toggle a ghostel popup at the project root (like `+vterm/toggle').
+With prefix ARG, kill the existing popup and create a fresh one."
+  (interactive "P")
+  (require 'ghostel)
+  (let* ((default-directory (or (doom-project-root) default-directory))
+         (name (format "*doom:ghostel-popup:%s*"
+                       (if (bound-and-true-p persp-mode)
+                           (safe-persp-name (get-current-persp))
+                         "main")))
+         (buf (get-buffer name))
+         (win (and buf (get-buffer-window buf))))
+    (when (and arg buf)
+      (when win (delete-window win))
+      (let (confirm-kill-processes) (kill-buffer buf))
+      (setq buf nil win nil))
+    (if win
+        (delete-window win)
+      (let ((ghostel-buffer-name name))
+        (ghostel)))))
+
 (map! :map 'override
       :leader
-      "'" #'+vterm/toggle)
+      :desc "Toggle ghostel popup" "'" #'my/ghostel-toggle
+      :desc "Open ghostel"         "\"" #'ghostel)
 
 ;; input method
 (use-package! agda-input)
